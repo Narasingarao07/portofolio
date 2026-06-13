@@ -1,0 +1,4 @@
+/* App.css - App-level overrides */
+.app {
+  overflow-x: hidden;
+}

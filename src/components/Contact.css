@@ -1,0 +1,137 @@
+.contact {
+    background: var(--bg);
+}
+
+.contact-inner {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 40px;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 20px;
+}
+
+.info-icon {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    background: var(--accent-light);
+    color: var(--accent-2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.info-l {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+}
+
+.info-v {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.info-v.highlight {
+    color: var(--accent);
+    transition: var(--transition);
+}
+
+.info-v.highlight:hover {
+    color: var(--accent-2);
+    text-decoration: underline;
+}
+
+.contact-form {
+    padding: 32px;
+}
+
+.form-msg {
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    color: #34d399;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.f-grp {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.f-grp label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.f-grp input,
+.f-grp textarea,
+.f-grp select {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: var(--transition);
+    outline: none;
+}
+
+.f-grp input:focus,
+.f-grp textarea:focus,
+.f-grp select:focus {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 4px rgba(92, 107, 255, 0.1);
+}
+
+.f-grp select option {
+    background: var(--bg-mid);
+    color: #fff;
+}
+
+.form-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+@media (max-width: 900px) {
+    .contact-inner {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}

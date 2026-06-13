@@ -1,0 +1,225 @@
+.certs {
+    background: var(--bg-mid);
+}
+
+.cert-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.cert-card {
+    padding: 24px;
+}
+
+.cert-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.cert-badge {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cert-emoji {
+    font-size: 1.6rem;
+}
+
+.cert-ext-link {
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.cert-ext-link:hover {
+    color: var(--accent-2);
+    transform: scale(1.1);
+}
+
+.cert-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.cert-issuer {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+}
+
+.cert-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.cert-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.cert-tag {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 50px;
+}
+
+@media (max-width: 900px) {
+    .cert-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .cert-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cert-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.cert-view-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    transition: var(--transition);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.cert-view-btn:hover {
+    color: var(--accent-2);
+    transform: scale(1.15);
+}
+
+/* Lightbox overlay for viewing certificates */
+.cert-viewer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(5, 8, 16, 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 24px;
+    animation: fadeInCertViewer 0.25s ease;
+}
+
+.cert-viewer-container {
+    position: relative;
+    background: #0d1225;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    width: 95%;
+    max-width: 1100px;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: scaleInCertViewer 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.cert-viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(10, 14, 26, 0.4);
+}
+
+.cert-viewer-header h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.cert-viewer-close {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.cert-viewer-close:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border-color: #ef4444;
+}
+
+.cert-viewer-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #070913;
+    padding: 24px;
+    position: relative;
+    overflow: auto;
+}
+
+.cert-viewer-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+    box-shadow: var(--shadow-md);
+}
+
+.cert-viewer-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 6px;
+    background: #fff;
+}
+
+@keyframes fadeInCertViewer {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleInCertViewer {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
