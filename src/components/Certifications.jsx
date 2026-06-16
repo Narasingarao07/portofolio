@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { FiAward, FiExternalLink, FiArrowRight, FiEye, FiX } from 'react-icons/fi'
@@ -77,7 +77,11 @@ export function CertCard({ c }) {
 
 
 export default function Certifications() {
-    const [certs] = useState(() => portfolioDb.getCertifications())
+    const [certs, setCerts] = useState([])
+
+    useEffect(() => {
+        portfolioDb.getCertifications().then(setCerts).catch(console.error)
+    }, [])
 
     const preview = certs.slice(0, 3);
     return (

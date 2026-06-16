@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { FiSend, FiMail, FiPhone, FiMapPin } from 'react-icons/fi'
+import { portfolioDb } from '../utils/portfolioDb'
 import './Contact.css'
 
 const info = [
@@ -11,11 +12,23 @@ const info = [
 export default function Contact() {
     const [form, setForm] = useState({ name: '', email: '', company: '', budget: '', timeline: '', message: '' })
     const [sent, setSent] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const hChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
-    const hSubmit = (e) => {
-        e.preventDefault(); setSent(true);
-        setTimeout(() => { setSent(false); setForm({ name: '', email: '', company: '', budget: '', timeline: '', message: '' }) }, 3500)
+    const hSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            await portfolioDb.addMessage(form);
+            setSent(true);
+            setForm({ name: '', email: '', company: '', budget: '', timeline: '', message: '' });
+            setTimeout(() => setSent(false), 3500);
+        } catch (err) {
+            console.error("Failed to send message:", err);
+            alert("Failed to send your message. Please try again later.");
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -85,8 +98,8 @@ export default function Contact() {
                             <textarea name="message" rows={5} placeholder="Describe your project, goals, requirements..." value={form.message} onChange={hChange} required />
                         </div>
 
-                        <button type="submit" className="btn-viewall form-btn">
-                            <FiSend /> Send Message
+                        <button type="submit" className="btn-viewall form-btn" disabled={loading}>
+                            <FiSend /> {loading ? 'Sending...' : 'Send Message'}
                         </button>
                     </form>
                 </div>

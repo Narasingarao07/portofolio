@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiExternalLink, FiGithub, FiArrowRight } from 'react-icons/fi'
 import { portfolioDb } from '../utils/portfolioDb'
@@ -33,7 +33,11 @@ export function ProjectCard({ p }) {
 }
 
 export default function Projects() {
-    const [projects] = useState(() => portfolioDb.getProjects())
+    const [projects, setProjects] = useState([])
+
+    useEffect(() => {
+        portfolioDb.getProjects().then(setProjects).catch(console.error)
+    }, [])
 
     // Show only featured projects on home page, or slice to 3
     const preview = projects.filter(p => p.featured).slice(0, 3)

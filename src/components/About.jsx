@@ -1,4 +1,4 @@
-import { FiCode, FiHeart, FiTarget, FiCoffee } from 'react-icons/fi'
+import { FiCode, FiHeart, FiVideo, FiCoffee } from 'react-icons/fi'
 import './About.css'
 import profile from "../assets/second.jpg"
 
@@ -33,8 +33,8 @@ export default function About() {
 
                     <div className="about-traits">
                         {[
-                            { icon: <FiTarget />, t: 'Problem Solver', d: 'Tackling complex challenges with elegant, scalable solutions.' },
                             { icon: <FiHeart />, t: 'Passionate Learner', d: 'Always curious, always growing, always picking up new skills.' },
+                            { icon: <FiVideo />, t: 'Video Editing Enthusiast', d: 'Transforming raw footage into captivating and meaningful content.' },
                         ].map(({ icon, t, d }) => (
                             <div key={t} className="trait glass">
                                 <div className="trait-icon">{icon}</div>

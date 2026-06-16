@@ -4,7 +4,7 @@ import {
     FiPlus, FiEdit2, FiTrash2, FiDownload, FiUpload, 
     FiRefreshCw, FiLogOut, FiArrowLeft, FiFolder, 
     FiAward, FiBook, FiBriefcase, FiX, FiCalendar, 
-    FiMapPin, FiCheck 
+    FiMapPin, FiCheck, FiMail
 } from 'react-icons/fi'
 import { portfolioDb } from '../utils/portfolioDb'
 import './AdminPage.css'
@@ -23,10 +23,11 @@ export default function AdminPage() {
     const [activeTab, setActiveTab] = useState('projects') // projects, certs, edu, exp
     
     // Data list states
-    const [projects, setProjects] = useState(() => portfolioDb.getProjects())
-    const [certs, setCerts] = useState(() => portfolioDb.getCertifications())
-    const [education, setEducation] = useState(() => portfolioDb.getEducation())
-    const [experience, setExperience] = useState(() => portfolioDb.getExperience())
+    const [projects, setProjects] = useState([])
+    const [certs, setCerts] = useState([])
+    const [education, setEducation] = useState([])
+    const [experience, setExperience] = useState([])
+    const [messages, setMessages] = useState([])
 
     // Modal state
     const [modalOpen, setModalOpen] = useState(false)
@@ -60,17 +61,31 @@ export default function AdminPage() {
     const fileInputRef = useRef(null)
     const navigate = useNavigate()
 
-    const refreshAllData = () => {
-        setProjects(portfolioDb.getProjects());
-        setCerts(portfolioDb.getCertifications());
-        setEducation(portfolioDb.getEducation());
-        setExperience(portfolioDb.getExperience());
+    const refreshAllData = async () => {
+        try {
+            const [projs, certificates, edu, exp, msgs] = await Promise.all([
+                portfolioDb.getProjects(),
+                portfolioDb.getCertifications(),
+                portfolioDb.getEducation(),
+                portfolioDb.getExperience(),
+                portfolioDb.getMessages()
+            ]);
+            setProjects(projs);
+            setCerts(certificates);
+            setEducation(edu);
+            setExperience(exp);
+            setMessages(msgs);
+        } catch (err) {
+            console.error("Failed to load portfolio database content", err);
+        }
     }
 
-    // Authentication Gate
+    // Authentication Gate & Data Load
     useEffect(() => {
         if (!isAuthenticated) {
             navigate('/login');
+        } else {
+            refreshAllData();
         }
     }, [isAuthenticated, navigate]);
 
@@ -138,113 +153,130 @@ export default function AdminPage() {
     }
 
     // CRUD: Save item
-    const handleSave = (e) => {
+    const handleSave = async (e) => {
         e.preventDefault();
         
-        if (activeTab === 'projects') {
-            const parsedTech = formTech.split(',').map(s => s.trim()).filter(Boolean);
-            const calculatedLetter = formLetter ? formLetter.trim() : (formTitle ? formTitle.trim().substring(0, 2).toUpperCase() : 'P');
-            const projectData = {
-                title: formTitle,
-                desc: formDesc,
-                tech: parsedTech,
-                github: formGithub,
-                live: formLive || null,
-                gradient: formGradient,
-                letter: calculatedLetter,
-                featured: formFeatured
-            };
-            if (editingItem) {
-                portfolioDb.updateProject(editingItem.id, projectData);
-            } else {
-                portfolioDb.addProject(projectData);
+        try {
+            if (activeTab === 'projects') {
+                const parsedTech = formTech.split(',').map(s => s.trim()).filter(Boolean);
+                const calculatedLetter = formLetter ? formLetter.trim() : (formTitle ? formTitle.trim().substring(0, 2).toUpperCase() : 'P');
+                const projectData = {
+                    title: formTitle,
+                    desc: formDesc,
+                    tech: parsedTech,
+                    github: formGithub,
+                    live: formLive || null,
+                    gradient: formGradient,
+                    letter: calculatedLetter,
+                    featured: formFeatured
+                };
+                if (editingItem) {
+                    await portfolioDb.updateProject(editingItem.id, projectData);
+                } else {
+                    await portfolioDb.addProject(projectData);
+                }
+            } 
+            else if (activeTab === 'certs') {
+                const parsedTags = formTags.split(',').map(s => s.trim()).filter(Boolean);
+                const certData = {
+                    title: formTitle,
+                    issuer: formIssuer,
+                    date: formDate,
+                    icon: formIcon,
+                    tags: parsedTags,
+                    link: formLink,
+                    color: formColor,
+                    attachment: formAttachment || null
+                };
+                if (editingItem) {
+                    await portfolioDb.updateCertification(editingItem.id, certData);
+                } else {
+                    await portfolioDb.addCertification(certData);
+                }
+            } 
+            else if (activeTab === 'edu') {
+                const eduData = {
+                    title: formTitle,
+                    org: formOrg,
+                    period: formPeriod,
+                    location: formLocation,
+                    badge: formBadge || null,
+                    desc: formDesc,
+                    type: 'edu',
+                    icon: 'book'
+                };
+                if (editingItem) {
+                    await portfolioDb.updateEducation(editingItem.id, eduData);
+                } else {
+                    await portfolioDb.addEducation(eduData);
+                }
             }
-        } 
-        else if (activeTab === 'certs') {
-            const parsedTags = formTags.split(',').map(s => s.trim()).filter(Boolean);
-            const certData = {
-                title: formTitle,
-                issuer: formIssuer,
-                date: formDate,
-                icon: formIcon,
-                tags: parsedTags,
-                link: formLink,
-                color: formColor,
-                attachment: formAttachment || null
-            };
-            if (editingItem) {
-                portfolioDb.updateCertification(editingItem.id, certData);
-            } else {
-                portfolioDb.addCertification(certData);
+            else if (activeTab === 'exp') {
+                const expData = {
+                    title: formTitle,
+                    org: formOrg,
+                    period: formPeriod,
+                    location: formLocation,
+                    badge: formBadge || null,
+                    desc: formDesc,
+                    type: 'exp',
+                    icon: 'briefcase'
+                };
+                if (editingItem) {
+                    await portfolioDb.updateExperience(editingItem.id, expData);
+                } else {
+                    await portfolioDb.addExperience(expData);
+                }
             }
-        } 
-        else if (activeTab === 'edu') {
-            const eduData = {
-                title: formTitle,
-                org: formOrg,
-                period: formPeriod,
-                location: formLocation,
-                badge: formBadge || null,
-                desc: formDesc,
-                type: 'edu',
-                icon: 'book'
-            };
-            if (editingItem) {
-                portfolioDb.updateEducation(editingItem.id, eduData);
-            } else {
-                portfolioDb.addEducation(eduData);
-            }
-        }
-        else if (activeTab === 'exp') {
-            const expData = {
-                title: formTitle,
-                org: formOrg,
-                period: formPeriod,
-                location: formLocation,
-                badge: formBadge || null,
-                desc: formDesc,
-                type: 'exp',
-                icon: 'briefcase'
-            };
-            if (editingItem) {
-                portfolioDb.updateExperience(editingItem.id, expData);
-            } else {
-                portfolioDb.addExperience(expData);
-            }
-        }
 
-        refreshAllData();
-        setModalOpen(false);
+            await refreshAllData();
+            setModalOpen(false);
+        } catch (err) {
+            console.error("Error saving portfolio item:", err);
+            alert("An error occurred while saving details.");
+        }
     }
 
     // CRUD: Delete item
-    const handleDelete = (id, title) => {
+    const handleDelete = async (id, title) => {
         if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-            if (activeTab === 'projects') {
-                portfolioDb.deleteProject(id);
-            } else if (activeTab === 'certs') {
-                portfolioDb.deleteCertification(id);
-            } else if (activeTab === 'edu') {
-                portfolioDb.deleteEducation(id);
-            } else if (activeTab === 'exp') {
-                portfolioDb.deleteExperience(id);
+            try {
+                if (activeTab === 'projects') {
+                    await portfolioDb.deleteProject(id);
+                } else if (activeTab === 'certs') {
+                    await portfolioDb.deleteCertification(id);
+                } else if (activeTab === 'edu') {
+                    await portfolioDb.deleteEducation(id);
+                } else if (activeTab === 'exp') {
+                    await portfolioDb.deleteExperience(id);
+                } else if (activeTab === 'messages') {
+                    await portfolioDb.deleteMessage(id);
+                }
+                await refreshAllData();
+            } catch (err) {
+                console.error("Error deleting portfolio item:", err);
+                alert("An error occurred while deleting the item.");
             }
-            refreshAllData();
         }
     }
 
     // GLOBAL ACTIONS
-    const handleExport = () => {
-        const jsonString = portfolioDb.exportConfig();
-        const dataBlob = new Blob([jsonString], { type: 'application/json' });
-        const downloadUrl = URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = 'portfolio_config.json';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(downloadUrl);
+    const handleExport = async () => {
+        try {
+            const jsonString = await portfolioDb.exportConfig();
+            const dataBlob = new Blob([jsonString], { type: 'application/json' });
+            const downloadUrl = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = 'portfolio_config.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(downloadUrl);
+        } catch (err) {
+            console.error("Error exporting database config:", err);
+            alert("An error occurred while exporting.");
+        }
     }
 
     const handleImportTrigger = () => {
@@ -256,11 +288,11 @@ export default function AdminPage() {
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (evt) => {
-            const success = portfolioDb.importConfig(evt.target.result);
+        reader.onload = async (evt) => {
+            const success = await portfolioDb.importConfig(evt.target.result);
             if (success) {
                 alert('Portfolio data imported successfully!');
-                refreshAllData();
+                await refreshAllData();
             } else {
                 alert('Invalid file format. Please upload a valid config JSON.');
             }
@@ -270,11 +302,16 @@ export default function AdminPage() {
         e.target.value = '';
     }
 
-    const handleReset = () => {
+    const handleReset = async () => {
         if (window.confirm('This will wipe all custom entries and restore the default portfolio data. Are you sure?')) {
-            portfolioDb.resetToDefaults();
-            refreshAllData();
-            alert('Default portfolio data restored.');
+            try {
+                await portfolioDb.resetToDefaults();
+                await refreshAllData();
+                alert('Default portfolio data restored.');
+            } catch (err) {
+                console.error("Error resetting database defaults:", err);
+                alert("An error occurred while resetting.");
+            }
         }
     }
 
@@ -374,6 +411,12 @@ export default function AdminPage() {
                     >
                         <FiBriefcase /> Experience
                     </div>
+                    <div 
+                        className={`admin-tab-btn ${activeTab === 'messages' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('messages')}
+                    >
+                        <FiMail /> Messages
+                    </div>
                 </div>
 
                 {/* Tab Content Dashboard */}
@@ -384,10 +427,13 @@ export default function AdminPage() {
                             {activeTab === 'certs' && 'Certifications List'}
                             {activeTab === 'edu' && 'Education Timeline'}
                             {activeTab === 'exp' && 'Experience Timeline'}
+                            {activeTab === 'messages' && 'Visitor Messages'}
                         </h2>
-                        <button onClick={openAddModal} className="btn-add-new">
-                            <FiPlus /> Add New Card
-                        </button>
+                        {activeTab !== 'messages' && (
+                            <button onClick={openAddModal} className="btn-add-new">
+                                <FiPlus /> Add New Card
+                            </button>
+                        )}
                     </div>
 
                     {/* Dynamic Lists */}
@@ -501,6 +547,60 @@ export default function AdminPage() {
                                     <div className="item-actions">
                                         <button onClick={() => openEditModal(x)} className="btn-action edit" title="Edit"><FiEdit2 /></button>
                                         <button onClick={() => handleDelete(x.id, x.title)} className="btn-action delete" title="Delete"><FiTrash2 /></button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+
+                        {activeTab === 'messages' && (
+                            messages.length === 0 ? (
+                                <div className="admin-empty-state">
+                                    <FiMail size={36} />
+                                    <p>No messages received yet.</p>
+                                </div>
+                            ) :
+                            messages.map(m => (
+                                <div key={m.id} className="admin-item-card message-card" style={{ padding: '20px', alignItems: 'flex-start' }}>
+                                    <div className="item-info-wrapper" style={{ width: '100%', gap: '16px' }}>
+                                        <div className="item-preview-visual" style={{ background: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6', alignSelf: 'flex-start' }}>
+                                            <FiMail />
+                                        </div>
+                                        <div className="item-main-details" style={{ flex: 1 }}>
+                                            <div className="item-title-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+                                                <h3 style={{ margin: 0, fontSize: '1.1rem' }}>{m.name}</h3>
+                                                <span className="item-badge" style={{ background: 'rgba(59, 130, 246, 0.08)', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.15)', fontSize: '0.8rem', padding: '3px 8px' }}>
+                                                    {m.email}
+                                                </span>
+                                            </div>
+                                            
+                                            <div className="message-sub-meta" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px 24px', fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
+                                                {m.company && (
+                                                    <span>
+                                                        <strong>Company:</strong> {m.company}
+                                                    </span>
+                                                )}
+                                                {m.budget && (
+                                                    <span>
+                                                        <strong>Budget:</strong> {m.budget === 'low' ? '< $500' : m.budget === 'mid' ? '$500 - $2000' : '$2000+'}
+                                                    </span>
+                                                )}
+                                                {m.timeline && (
+                                                    <span>
+                                                        <strong>Timeline:</strong> {m.timeline === 'urgent' ? '< 1 month' : m.timeline === 'standard' ? '1 - 3 months' : '3+ months'}
+                                                    </span>
+                                                )}
+                                                <span style={{ color: 'var(--accent-2)' }}>
+                                                    {new Date(m.createdAt).toLocaleString()}
+                                                </span>
+                                            </div>
+
+                                            <div className="message-content-body" style={{ marginTop: '12px', color: '#cbd5e1', background: 'rgba(255, 255, 255, 0.015)', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--glass-border)', fontSize: '0.92rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
+                                                {m.message}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="item-actions" style={{ alignSelf: 'flex-start', marginTop: '4px' }}>
+                                        <button onClick={() => handleDelete(m.id, `Message from ${m.name}`)} className="btn-action delete" title="Delete Message"><FiTrash2 /></button>
                                     </div>
                                 </div>
                             ))

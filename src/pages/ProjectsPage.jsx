@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiArrowLeft } from 'react-icons/fi'
 import { ProjectCard } from '../components/Projects'
@@ -7,7 +7,11 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
 export default function ProjectsPage() {
-    const [projects] = useState(() => portfolioDb.getProjects())
+    const [projects, setProjects] = useState([])
+
+    useEffect(() => {
+        portfolioDb.getProjects().then(setProjects).catch(console.error);
+    }, [])
 
     return (
         <div className="sub-page">

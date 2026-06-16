@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiBook, FiBriefcase, FiCalendar, FiMapPin, FiArrowRight } from 'react-icons/fi'
 import { portfolioDb } from '../utils/portfolioDb'
@@ -29,8 +29,13 @@ export function TimelineCard({ item }) {
 }
 
 export default function Education() {
-    const [eduList] = useState(() => portfolioDb.getEducation())
-    const [expList] = useState(() => portfolioDb.getExperience())
+    const [eduList, setEduList] = useState([])
+    const [expList, setExpList] = useState([])
+
+    useEffect(() => {
+        portfolioDb.getEducation().then(setEduList).catch(console.error)
+        portfolioDb.getExperience().then(setExpList).catch(console.error)
+    }, [])
 
     const firstEdu = eduList[0]
     const firstExp = expList[0]

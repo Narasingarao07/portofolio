@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiArrowLeft } from 'react-icons/fi'
 import { CertCard } from '../components/Certifications'
@@ -7,7 +7,11 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
 export default function CertificationsPage() {
-    const [certs] = useState(() => portfolioDb.getCertifications())
+    const [certs, setCerts] = useState([])
+
+    useEffect(() => {
+        portfolioDb.getCertifications().then(setCerts).catch(console.error);
+    }, [])
 
     return (
         <div className="sub-page">

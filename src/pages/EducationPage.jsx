@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiArrowLeft, FiBook, FiBriefcase } from 'react-icons/fi'
 import { TimelineCard } from '../components/Education'
@@ -7,8 +7,13 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
 export default function EducationPage() {
-    const [eduList] = useState(() => portfolioDb.getEducation())
-    const [expList] = useState(() => portfolioDb.getExperience())
+    const [eduList, setEduList] = useState([])
+    const [expList, setExpList] = useState([])
+
+    useEffect(() => {
+        portfolioDb.getEducation().then(setEduList).catch(console.error);
+        portfolioDb.getExperience().then(setExpList).catch(console.error);
+    }, [])
 
     return (
         <div className="sub-page">
