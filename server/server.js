@@ -342,6 +342,10 @@ app.get(/.*/, (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+export default app;
