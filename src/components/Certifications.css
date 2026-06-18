@@ -223,3 +223,78 @@
     from { transform: scale(0.95); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
 }
+
+/* Responsive PDF and certificate modal adjustments */
+.cert-viewer-body.pdf-viewer {
+    display: block;
+}
+
+.cert-viewer-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cert-viewer-open-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(92, 107, 255, 0.12);
+    border: 1px solid rgba(92, 107, 255, 0.25);
+    color: #a78bfa;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.cert-viewer-open-btn:hover {
+    background: rgba(92, 107, 255, 0.25);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .cert-viewer-overlay {
+        padding: 12px;
+    }
+    
+    .cert-viewer-container {
+        width: 100%;
+        max-width: 600px;
+        height: 60vh; /* Set to 60vh to form a clean landscape/rectangular box shape */
+        border-radius: var(--radius-md);
+    }
+    
+    .cert-viewer-header {
+        padding: 12px 16px;
+    }
+    
+    .cert-viewer-header h3 {
+        font-size: 0.9rem;
+    }
+    
+    .cert-viewer-body {
+        padding: 10px;
+    }
+    
+    .cert-viewer-body.pdf-viewer {
+        display: block;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .cert-viewer-body.img-viewer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .cert-viewer-iframe {
+        width: 100%;
+        height: 100%;
+        min-height: 100%;
+    }
+}

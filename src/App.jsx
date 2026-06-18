@@ -14,6 +14,7 @@ import EducationPage from './pages/EducationPage'
 import SkillsPage from './pages/SkillsPage'
 import LoginPage from './pages/LoginPage'
 import AdminPage from './pages/AdminPage'
+import Chatbot from './components/Chatbot'
 import './App.css'
 
 function HomePage() {
@@ -46,6 +47,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/admin" element={<AdminPage />} />
       </Routes>
+      <Chatbot />
     </BrowserRouter>
   )
 }

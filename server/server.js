@@ -337,6 +337,121 @@ app.post('/api/import', async (req, res) => {
     }
 });
 
+// --- CHATBOT ---
+app.post('/api/chat', async (req, res) => {
+    try {
+        const { message, history } = req.body;
+        if (!message) {
+            return res.status(400).json({ message: 'Message is required.' });
+        }
+
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            return res.status(500).json({ message: 'Gemini API Key is not configured on the server.' });
+        }
+
+        // Fetch the latest data from the database
+        const [projects, certifications, education, experience] = await Promise.all([
+            Project.find(),
+            Certification.find(),
+            Education.find(),
+            Experience.find()
+        ]);
+
+        // Format data into context
+        const projectsContext = projects.map(p => 
+            `- ${p.title}: ${p.desc} (Technologies: ${p.tech.join(', ')}). GitHub: ${p.github}, Live demo: ${p.live || 'N/A'}`
+        ).join('\n');
+
+        const educationContext = education.map(e =>
+            `- ${e.title} at ${e.org} (${e.period}). Location: ${e.location}. Score/Badge: ${e.badge || 'N/A'}. Details: ${e.desc}`
+        ).join('\n');
+
+        const experienceContext = experience.map(x =>
+            `- ${x.title} at ${x.org} (${x.period}). Location: ${x.location}. Details: ${x.desc}`
+        ).join('\n');
+
+        const certificationsContext = certifications.map(c =>
+            `- ${c.title} issued by ${c.issuer} (${c.date}). Skills/Tags: ${c.tags.join(', ')}`
+        ).join('\n');
+
+        const systemContext = `You are a professional, friendly, and helpful AI assistant chatbot representing Narasinga Rao Tammineni (often called Narasinga) on his personal portfolio website.
+
+Your task is to answer user queries using his verified portfolio and resume details:
+
+--- PROJECTS ---
+${projectsContext}
+
+--- EDUCATION ---
+${educationContext}
+
+--- EXPERIENCE ---
+${experienceContext}
+
+--- CERTIFICATIONS ---
+${certificationsContext}
+
+--- ADDITIONAL INFO ---
+Name: Narasinga Rao Tammineni
+Role: Full-Stack Developer & CS Student
+College: Gayatri Vidya Parishad College of Engineering (GVPCE), current CGPA: 8.2/10
+Diploma College: Sai Ganapathi Polytechnic College, Score: 9.4/10
+Interests: Web development, open-source, video editing, competitive programming.
+Skills: React, Node.js, Express, MongoDB, Python, Django, AWS, Postgres, Firebase, Git, video editing.
+
+Guidelines:
+1. Answer queries accurately based on the context above. If something is not mentioned, politely explain you don't have that information. Do not invent details.
+2. Keep your answers brief, engaging, and professional.
+3. If the user asks something completely unrelated to Narasinga's professional background, skills, or portfolio, politely ask them to focus their questions on Narasinga's profile.
+4. Respond using clean markdown formatting (bolding, lists, etc.) when appropriate. Do not use generic greetings in every single message unless it is the first turn.`;
+
+        // Format history and current message for Gemini API
+        const contents = [];
+        if (history && Array.isArray(history)) {
+            history.slice(-10).forEach(item => {
+                contents.push({
+                    role: item.role === 'user' ? 'user' : 'model',
+                    parts: [{ text: item.text }]
+                });
+            });
+        }
+        
+        contents.push({
+            role: 'user',
+            parts: [{ text: message }]
+        });
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                systemInstruction: {
+                    parts: [{ text: systemContext }]
+                },
+                contents: contents
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Gemini API Error:', errorText);
+            return res.status(502).json({ message: 'Error response from Gemini API', error: errorText });
+        }
+
+        const data = await response.json();
+        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm sorry, I couldn't generate a response.";
+        res.json({ response: responseText });
+
+    } catch (err) {
+        console.error('Chat error:', err);
+        res.status(500).json({ message: 'Server error during chat processing', error: err.message });
+    }
+});
+
 // Fallback for non-API client routes (SPA routing)
 app.get(/.*/, (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));

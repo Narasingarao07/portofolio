@@ -48,11 +48,22 @@ export function CertCard({ c }) {
                     <div className="cert-viewer-container">
                         <div className="cert-viewer-header">
                             <h3>{c.title} — Credential View</h3>
-                            <button onClick={() => setViewerOpen(false)} className="cert-viewer-close" title="Close Window">
-                                <FiX />
-                            </button>
+                            <div className="cert-viewer-header-actions">
+                                <a 
+                                    href={c.attachment} 
+                                    target="_blank" 
+                                    rel="noreferrer" 
+                                    className="cert-viewer-open-btn" 
+                                    title="Open in New Tab"
+                                >
+                                    <FiExternalLink /> Open
+                                </a>
+                                <button onClick={() => setViewerOpen(false)} className="cert-viewer-close" title="Close Window">
+                                    <FiX />
+                                </button>
+                            </div>
                         </div>
-                        <div className="cert-viewer-body">
+                        <div className={`cert-viewer-body ${c.attachment.startsWith('data:application/pdf') ? 'pdf-viewer' : 'img-viewer'}`}>
                             {c.attachment.startsWith('data:application/pdf') ? (
                                 <iframe 
                                     src={c.attachment} 
