@@ -159,7 +159,7 @@ export default function Chatbot() {
                             </div>
                             <div>
                                 <h4>Narasinga's AI Bot</h4>
-                                <span className="chatbot-status">Gemini 1.5 Flash • Online</span>
+                                <span className="chatbot-status">Gemini 2.5 Flash • Online</span>
                             </div>
                         </div>
                         <div className="chatbot-header-actions">
