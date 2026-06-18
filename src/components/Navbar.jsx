@@ -39,7 +39,7 @@ export default function Navbar() {
                         </li>
                     ))}
                     <li>
-                        <a href="src\assets\resume.pdf" download className="btn-primary nav-resume">
+                        <a href="/resume.pdf" download className="btn-primary nav-resume">
                             <FiDownload size={14} /> Resume
                         </a>
                     </li>

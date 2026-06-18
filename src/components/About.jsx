@@ -45,7 +45,7 @@ export default function About() {
 
                     <div className="about-cta">
                         <a href="#contact" className="btn-primary">Get In Touch</a>
-                        <a href="src\assets\resume.pdf" download className="btn-outline">Download CV</a>
+                        <a href="/resume.pdf" download className="btn-outline">Download CV</a>
                     </div>
                 </div>
             </div>
